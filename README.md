@@ -82,7 +82,7 @@ La URL del backend se define en `src/environments/environment.ts`:
 ```typescript
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:5000/api/v1'
+  apiBaseUrl: 'http://localhost:5000/api'
 };
 ```
 

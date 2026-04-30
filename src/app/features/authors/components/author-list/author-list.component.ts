@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -17,10 +16,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { AuthorService } from '../../services/author.service';
-import { BookService } from '../../../books/services/book.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Author } from '../../../../core/models/author.model';
-import { Book } from '../../../../core/models/book.model';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { AuthorFormComponent } from '../author-form/author-form.component';
 import { EnrichedAuthor } from '../../interfaces/author.interfaces';
@@ -48,13 +45,11 @@ import { EnrichedAuthor } from '../../interfaces/author.interfaces';
 })
 export class AuthorListComponent {
   private authorService = inject(AuthorService);
-  private bookService = inject(BookService);
   private notification = inject(NotificationService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
   protected readonly authors = signal<Author[]>([]);
-  protected readonly books = signal<Book[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly currentCursor = signal<string | null>(null);
   protected readonly nextCursor = signal<string | null>(null);
@@ -76,13 +71,26 @@ export class AuthorListComponent {
   );
 
   protected readonly enrichedAuthors = computed<EnrichedAuthor[]>(() => {
-    const bookIds = new Set(this.books().map(b => b.id));
-    return this.authors().map(a => ({
-      ...a,
-      fullName: `${a.firstName} ${a.lastName}`,
-      initials: `${a.firstName[0] ?? ''}${a.lastName[0] ?? ''}`.toUpperCase(),
-      hasBook: bookIds.has(a.idBook)
-    }));
+    const list = this.authors();
+    const nameMap = new Map<string, Set<number>>();
+    for (const a of list) {
+      const key = `${a.firstName.trim().toLowerCase()}|${a.lastName.trim().toLowerCase()}`;
+      const bucket = nameMap.get(key);
+      if (bucket) {
+        bucket.add(a.idBook);
+      } else {
+        nameMap.set(key, new Set([a.idBook]));
+      }
+    }
+    return list.map(a => {
+      const key = `${a.firstName.trim().toLowerCase()}|${a.lastName.trim().toLowerCase()}`;
+      return {
+        ...a,
+        fullName: `${a.firstName} ${a.lastName}`,
+        initials: `${a.firstName[0] ?? ''}${a.lastName[0] ?? ''}`.toUpperCase(),
+        bookCount: nameMap.get(key)?.size ?? 0
+      };
+    });
   });
 
   protected readonly filteredAuthors = computed<EnrichedAuthor[]>(() => {
@@ -107,15 +115,11 @@ export class AuthorListComponent {
   private loadData(): void {
     this.isLoading.set(true);
     const cursor = this.currentCursor();
-    forkJoin({
-      paged: this.authorService.getPaged(cursor, this.pageSize()),
-      books: this.bookService.getAll()
-    }).pipe(
+    this.authorService.getPaged(cursor, this.pageSize()).pipe(
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isLoading.set(false))
-    ).subscribe(({ paged, books }) => {
+    ).subscribe(paged => {
       this.authors.set(paged.items);
-      this.books.set(books);
       this.nextCursor.set(paged.nextCursor);
       this.previousCursor.set(paged.previousCursor);
       this.dataSource.data = this.filteredAuthors();
