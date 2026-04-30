@@ -1,0 +1,105 @@
+<mat-card class="mat-elevation-z2">
+  <mat-card-header>
+    <div mat-card-avatar style="background: #3F51B5; display: flex; align-items: center; justify-content: center">
+      <mat-icon style="color: white">{{ isEditMode() ? 'edit' : 'add_circle' }}</mat-icon>
+    </div>
+    <mat-card-title>{{ isEditMode() ? 'Editar Libro' : 'Nuevo Libro' }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ isEditMode() ? 'Modifique los campos necesarios' : 'Complete todos los campos requeridos' }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content style="padding: 24px">
+    <form [formGroup]="form">
+
+      <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 8px">
+        <mat-label>Título del Libro</mat-label>
+        <mat-icon matPrefix>title</mat-icon>
+        <input matInput formControlName="title" placeholder="Ingrese el título" />
+        <mat-hint>Mínimo 3 caracteres, máximo 200</mat-hint>
+        @if (form.get('title')?.hasError('required')) {
+          <mat-error>El título es requerido</mat-error>
+        }
+        @if (form.get('title')?.hasError('minlength')) {
+          <mat-error>Mínimo 3 caracteres</mat-error>
+        }
+        @if (form.get('title')?.hasError('maxlength')) {
+          <mat-error>Máximo 200 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 8px">
+        <mat-label>Descripción</mat-label>
+        <mat-icon matPrefix>notes</mat-icon>
+        <textarea
+          matInput
+          formControlName="description"
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="3"
+          cdkAutosizeMaxRows="6"
+          placeholder="Descripción del libro"></textarea>
+        <mat-hint align="end">{{ descriptionLength() }}/500</mat-hint>
+        @if (form.get('description')?.hasError('maxlength')) {
+          <mat-error>Máximo 500 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px">
+        <mat-form-field appearance="outline">
+          <mat-label>Número de páginas</mat-label>
+          <mat-icon matPrefix>menu_book</mat-icon>
+          <input matInput type="number" formControlName="pageCount" min="1" />
+          @if (form.get('pageCount')?.hasError('required')) {
+            <mat-error>Requerido</mat-error>
+          }
+          @if (form.get('pageCount')?.hasError('min')) {
+            <mat-error>Debe ser mayor a 0</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de publicación</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="publishDate" />
+          <mat-datepicker-toggle matSuffix [for]="picker" />
+          <mat-datepicker #picker />
+          @if (form.get('publishDate')?.hasError('required')) {
+            <mat-error>La fecha es requerida</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Extracto</mat-label>
+        <mat-icon matPrefix>format_quote</mat-icon>
+        <textarea
+          matInput
+          formControlName="excerpt"
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="4"
+          cdkAutosizeMaxRows="8"></textarea>
+        <mat-hint align="end">{{ excerptLength() }}/1000</mat-hint>
+        @if (form.get('excerpt')?.hasError('maxlength')) {
+          <mat-error>Máximo 1000 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+    </form>
+  </mat-card-content>
+
+  <mat-divider />
+
+  <mat-card-actions align="end" style="padding: 16px 24px">
+    <button mat-stroked-button (click)="cancel()" style="margin-right: 8px">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSubmitting()">
+      <mat-icon>{{ isSubmitting() ? 'hourglass_empty' : 'save' }}</mat-icon>
+      {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,29 @@
+<div style="text-align: center; padding: 8px">
+  <div
+    style="width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px"
+    [style.background]="data.type === 'delete' ? '#FFEBEE' : '#FFF8E1'">
+    <mat-icon
+      [style.color]="data.type === 'delete' ? '#D32F2F' : '#F57C00'"
+      style="font-size: 36px; width: 36px; height: 36px">
+      {{ data.type === 'delete' ? 'delete_forever' : 'warning' }}
+    </mat-icon>
+  </div>
+
+  <h2 mat-dialog-title style="margin: 0 0 8px">{{ data.title }}</h2>
+
+  <mat-dialog-content>
+    <p class="mat-body-1" style="color: rgba(0,0,0,0.7); margin: 0">{{ data.message }}</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="center" style="gap: 12px; padding: 16px 0 0">
+    <button mat-stroked-button [mat-dialog-close]="false">
+      {{ data.type === 'delete' ? 'Cancelar' : 'Seguir editando' }}
+    </button>
+    <button
+      mat-raised-button
+      [color]="data.type === 'delete' ? 'warn' : 'accent'"
+      [mat-dialog-close]="true">
+      {{ data.type === 'delete' ? 'Eliminar' : 'Descartar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

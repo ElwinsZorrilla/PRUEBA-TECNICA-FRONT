@@ -1,0 +1,55 @@
+<mat-toolbar color="primary" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000">
+  @if (isMobile()) {
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+  <mat-icon style="margin-right: 8px">menu_book</mat-icon>
+  <span>Library Proxy</span>
+</mat-toolbar>
+
+<mat-sidenav-container style="position: fixed; top: 64px; left: 0; right: 0; bottom: 0">
+  <mat-sidenav
+    #sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile()"
+    style="width: 256px">
+
+    <!-- <div style="padding: 16px; background: #3F51B5; color: white">
+      <mat-icon style="font-size: 40px; width: 40px; height: 40px">menu_book</mat-icon>
+      <p class="mat-subtitle-1" style="margin: 8px 0 4px">Library Proxy</p>
+    </div> -->
+
+    <mat-nav-list>
+      <a
+        mat-list-item
+        routerLink="/books"
+        routerLinkActive
+        #booksLink="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [style.background]="booksLink.isActive ? 'rgba(63,81,181,0.08)' : 'transparent'">
+        <mat-icon matListItemIcon>menu_book</mat-icon>
+        <span matListItemTitle>Libros</span>
+      </a>
+      <a
+        mat-list-item
+        routerLink="/authors"
+        routerLinkActive
+        #authorsLink="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [style.background]="authorsLink.isActive ? 'rgba(63,81,181,0.08)' : 'transparent'">
+        <mat-icon matListItemIcon>people</mat-icon>
+        <span matListItemTitle>Autores</span>
+      </a>
+    </mat-nav-list>
+
+    <div style="position: absolute; bottom: 16px; padding: 0 16px">
+      <span class="mat-caption" style="color: rgba(0,0,0,0.5)">v1.0.0</span>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content style="padding: 24px; background: #f5f5f5">
+    <router-outlet />
+    <app-loading-spinner />
+  </mat-sidenav-content>
+</mat-sidenav-container>

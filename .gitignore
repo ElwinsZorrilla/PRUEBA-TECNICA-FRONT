@@ -1,28 +1,77 @@
-# Angular specific
-/dist/
-/out-tsc/
-/tmp/
-/coverage/
-/e2e/test-output/
-/.angular/
-.angular/
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Node modules and dependency files
-/node_modules/
-/package-lock.json
-/yarn.lock
+# ---------------------------------------------------------
+# Compiled output
+# ---------------------------------------------------------
+/dist
+/tmp
+/out-tsc
+/bazel-out
+/build
 
-# Environment files
-/.env
-
-# Angular CLI and build artefacts
-/.angular-cli.json
-/.ng/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Logs
+# ---------------------------------------------------------
+# Node
+# ---------------------------------------------------------
+/node_modules
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------------------------------------------------------
+# Angular
+# ---------------------------------------------------------
+.angular/
+/.angular/cache
+
+# ---------------------------------------------------------
+# Tests / coverage
+# ---------------------------------------------------------
+/coverage
+/.nyc_output
+/karma-results
+testem.log
+
+# ---------------------------------------------------------
+# IDEs y editores
+# ---------------------------------------------------------
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# ---------------------------------------------------------
+# Variables de entorno / secretos
+# ---------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------
+# Logs y misceláneos
+# ---------------------------------------------------------
+.sass-cache/
+/connect.lock
+/libpeerconnection.log
+/typings
+*.log
+
+# ---------------------------------------------------------
+# Sistema operativo
+# ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

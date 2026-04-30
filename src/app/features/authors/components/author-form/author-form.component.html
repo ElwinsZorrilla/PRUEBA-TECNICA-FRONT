@@ -1,0 +1,97 @@
+<mat-card class="mat-elevation-z2">
+  <mat-card-header>
+    <div mat-card-avatar style="background: #3F51B5; display: flex; align-items: center; justify-content: center">
+      <mat-icon style="color: white">{{ isEditMode() ? 'edit' : 'person_add' }}</mat-icon>
+    </div>
+    <mat-card-title>{{ isEditMode() ? 'Editar Autor' : 'Nuevo Autor' }}</mat-card-title>
+    <mat-card-subtitle>
+      {{ isEditMode() ? 'Modifique los campos necesarios' : 'Complete todos los campos requeridos' }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content style="padding: 24px">
+    <form [formGroup]="form">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input matInput formControlName="firstName" placeholder="Juan" />
+          @if (form.get('firstName')?.hasError('required')) {
+            <mat-error>El nombre es requerido</mat-error>
+          }
+          @if (form.get('firstName')?.hasError('minlength')) {
+            <mat-error>Mínimo 2 caracteres</mat-error>
+          }
+          @if (form.get('firstName')?.hasError('maxlength')) {
+            <mat-error>Máximo 100 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Apellido</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input matInput formControlName="lastName" placeholder="Pérez" />
+          @if (form.get('lastName')?.hasError('required')) {
+            <mat-error>El apellido es requerido</mat-error>
+          }
+          @if (form.get('lastName')?.hasError('minlength')) {
+            <mat-error>Mínimo 2 caracteres</mat-error>
+          }
+          @if (form.get('lastName')?.hasError('maxlength')) {
+            <mat-error>Máximo 100 caracteres</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>ID del Libro asociado</mat-label>
+        <mat-icon matPrefix>link</mat-icon>
+        <input matInput type="number" formControlName="idBook" min="1" placeholder="Ej: 1" />
+        <mat-hint>ID del libro que escribió este autor</mat-hint>
+        @if (form.get('idBook')?.hasError('required')) {
+          <mat-error>El ID del libro es requerido</mat-error>
+        }
+        @if (form.get('idBook')?.hasError('min')) {
+          <mat-error>Debe ser mayor a 0</mat-error>
+        }
+      </mat-form-field>
+
+      @if (form.get('firstName')?.value || form.get('lastName')?.value) {
+        <mat-card appearance="outlined" style="margin-top: 16px; background: #f5f5f5">
+          <mat-card-content style="padding: 16px">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #3F51B5; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 500; flex-shrink: 0">
+                {{ previewInitials() }}
+              </div>
+              <div>
+                <p class="mat-subtitle-1" style="margin: 0">{{ previewFullName() }}</p>
+                <p class="mat-body-2" style="margin: 0; color: rgba(0,0,0,0.6)">
+                  Autor del libro ID: {{ form.get('idBook')?.value || '—' }}
+                </p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+    </form>
+  </mat-card-content>
+
+  <mat-divider />
+
+  <mat-card-actions align="end" style="padding: 16px 24px">
+    <button mat-stroked-button (click)="cancel()" style="margin-right: 8px">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="form.invalid || isSubmitting()">
+      <mat-icon>{{ isSubmitting() ? 'hourglass_empty' : 'save' }}</mat-icon>
+      {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </mat-card-actions>
+</mat-card>

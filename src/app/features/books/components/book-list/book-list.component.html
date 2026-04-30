@@ -1,0 +1,196 @@
+<div style="display: flex; align-items: center; margin-bottom: 24px">
+  <div>
+    <h1 class="mat-headline-5" style="margin: 0">Libros</h1>
+    <p class="mat-body-2" style="margin: 4px 0 0; color: rgba(0,0,0,0.6)">
+      Gestión del catálogo de libros
+    </p>
+  </div>
+  <span class="spacer"></span>
+  <button mat-raised-button color="primary" (click)="openCreate()">
+    <mat-icon>add</mat-icon>
+    Agregar Libro
+  </button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px">
+  <mat-card class="mat-elevation-z2" style="border-left: 4px solid #3F51B5">
+    <mat-card-content style="padding: 16px; display: flex; align-items: center; justify-content: space-between">
+      <div>
+        <p class="mat-caption" style="margin: 0; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 500">Total Libros</p>
+        <p class="mat-headline-4" style="margin: 4px 0 0; font-weight: 600">{{ totalBooks() }}</p>
+      </div>
+      <div style="background: #E8EAF6; border-radius: 8px; padding: 12px; display: flex">
+        <mat-icon style="color: #3F51B5">menu_book</mat-icon>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z2" style="border-left: 4px solid #FFC107">
+    <mat-card-content style="padding: 16px; display: flex; align-items: center; justify-content: space-between">
+      <div>
+        <p class="mat-caption" style="margin: 0; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 500">Publicados {{ currentYear }}</p>
+        <p class="mat-headline-4" style="margin: 4px 0 0; font-weight: 600">{{ currentYearPublished() }}</p>
+      </div>
+      <div style="background: #FFF8E1; border-radius: 8px; padding: 12px; display: flex">
+        <mat-icon style="color: #FFC107">event</mat-icon>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z2" style="border-left: 4px solid #4CAF50">
+    <mat-card-content style="padding: 16px; display: flex; align-items: center; justify-content: space-between">
+      <div>
+        <p class="mat-caption" style="margin: 0; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 500">Promedio Páginas</p>
+        <p class="mat-headline-4" style="margin: 4px 0 0; font-weight: 600">{{ avgPageCount() }}</p>
+      </div>
+      <div style="background: #E8F5E9; border-radius: 8px; padding: 12px; display: flex">
+        <mat-icon style="color: #4CAF50">description</mat-icon>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z2" style="border-left: 4px solid #E91E63">
+    <mat-card-content style="padding: 16px; display: flex; align-items: center; justify-content: space-between">
+      <div>
+        <p class="mat-caption" style="margin: 0; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 500">Autores</p>
+        <p class="mat-headline-4" style="margin: 4px 0 0; font-weight: 600">{{ totalAuthors() }}</p>
+      </div>
+      <div style="background: #FCE4EC; border-radius: 8px; padding: 12px; display: flex">
+        <mat-icon style="color: #E91E63">people</mat-icon>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<mat-form-field appearance="outline" style="width: 100%; margin-bottom: 16px">
+  <mat-label>Buscar libros</mat-label>
+  <mat-icon matPrefix>search</mat-icon>
+  <input matInput [formControl]="searchControl" (input)="onSearchChange()" placeholder="Título, descripción, páginas, fecha, autor..." />
+  @if (searchControl.value) {
+    <button mat-icon-button matSuffix type="button" (click)="searchControl.reset(''); onSearchChange()">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+</mat-form-field>
+
+<mat-card class="mat-elevation-z2">
+  <mat-card-content style="padding: 0">
+
+    @if (isLoading()) {
+      <div style="padding: 16px">
+        @for (i of [1,2,3,4,5]; track i) {
+          <div class="skeleton-block" style="height: 52px; margin-bottom: 8px"></div>
+        }
+      </div>
+    } @else if (filteredBooks().length === 0) {
+      <div style="text-align: center; padding: 48px 24px">
+        <mat-icon style="font-size: 64px; width: 64px; height: 64px; color: #e0e0e0">menu_book</mat-icon>
+        @if (books().length === 0) {
+          <p class="mat-headline-6" style="margin: 16px 0 8px">No hay libros disponibles</p>
+          <p class="mat-body-2" style="color: rgba(0,0,0,0.5); margin: 0 0 16px">
+            Comienza agregando tu primer libro
+          </p>
+          <button mat-raised-button color="primary" (click)="openCreate()">
+            <mat-icon>add</mat-icon>
+            Agregar Libro
+          </button>
+        } @else {
+          <p class="mat-headline-6" style="margin: 16px 0 8px">No hay resultados</p>
+          <p class="mat-body-2" style="color: rgba(0,0,0,0.5); margin: 0">
+            Intenta con otros términos de búsqueda
+          </p>
+        }
+      </div>
+    } @else {
+      <table mat-table [dataSource]="dataSource" [trackBy]="trackById" style="width: 100%">
+
+        <ng-container matColumnDef="index">
+          <th mat-header-cell *matHeaderCellDef style="width: 60px">#</th>
+          <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>TÍTULO</th>
+          <td mat-cell *matCellDef="let row">
+            <p class="mat-subtitle-2" style="margin: 0">{{ row.title }}</p>
+            <p class="mat-caption" style="margin: 0; opacity: 0.7">
+              {{ truncate(row.description, 60) }}
+            </p>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="pageCount">
+          <th mat-header-cell *matHeaderCellDef style="width: 120px">PÁGINAS</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-chip color="primary" disableRipple>{{ row.pageCount }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="publishDate">
+          <th mat-header-cell *matHeaderCellDef style="width: 140px">PUBLICADO</th>
+          <td mat-cell *matCellDef="let row">{{ row.publishDate | date:'dd MMM yyyy' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="author">
+          <th mat-header-cell *matHeaderCellDef style="width: 180px">AUTOR</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.authorName) {
+              <span class="mat-body-2">{{ row.authorName }}</span>
+            } @else {
+              <span class="mat-body-2" style="color: #D32F2F">Sin autor</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef style="width: 110px; text-align: center">ACCIONES</th>
+          <td mat-cell *matCellDef="let row" style="white-space: nowrap; text-align: center">
+            <button mat-icon-button color="primary" matTooltip="Ver detalle" (click)="openDetail(row.id)" style="margin: 0 2px">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" matTooltip="Editar" (click)="openEdit(row.id)" style="margin: 0 2px">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="delete(row)" style="margin: 0 2px">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    }
+
+  </mat-card-content>
+
+  @if (!isLoading() && filteredBooks().length > 0) {
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-top: 1px solid #e0e0e0; gap: 16px; flex-wrap: wrap">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span class="mat-body-2" style="color: rgba(0,0,0,0.6)">Items por página:</span>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 80px">
+          <mat-select [value]="pageSize()" (selectionChange)="onPageSizeChange($event.value)">
+            @for (size of pageSizeOptions; track size) {
+              <mat-option [value]="size">{{ size }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <span class="mat-body-2" style="color: rgba(0,0,0,0.6)">
+          Mostrando {{ filteredBooks().length }} items
+        </span>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button mat-stroked-button [disabled]="currentCursor() === null" (click)="firstPage()" matTooltip="Primera página">
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button mat-stroked-button [disabled]="!previousCursor()" (click)="previousPage()" matTooltip="Página anterior">
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+        <button mat-stroked-button [disabled]="!nextCursor()" (click)="nextPage()" matTooltip="Página siguiente">
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</mat-card>
+<div style="height: 32px"></div>
