@@ -118,6 +118,10 @@ Los formularios de crear y editar no son páginas separadas. Se abren como modal
 
 Cada listado tiene un input que filtra mientras escribes. La búsqueda mira todos los campos relevantes: título, descripción, fecha, número de páginas, nombre del autor, etc.
 
+### Lista de autores
+
+La FakeRestAPI tiene una relación 1:N entre Book y Author: un libro puede tener varios autores, pero cada autor está asociado a un único libro. Por eso, "número de libros publicados por autor" siempre sería 1, sin información útil. La columna **AUTORES DEL LIBRO** muestra el tamaño del equipo de coautoría del libro asociado al autor (campo `bookCount`), un dato que sí varía entre filas. El backend lo calcula en la capa Application y lo devuelve enriquecido en el DTO; el frontend solo lo renderiza.
+
 ### Paginación con cursor
 
 La API devuelve un `nextCursor` y `previousCursor` en lugar de offsets. El usuario puede elegir cuántos items ver por página (10, 20, 30 o 40).

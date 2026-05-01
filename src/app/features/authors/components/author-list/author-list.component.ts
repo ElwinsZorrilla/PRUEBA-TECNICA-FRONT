@@ -71,26 +71,13 @@ export class AuthorListComponent {
   );
 
   protected readonly enrichedAuthors = computed<EnrichedAuthor[]>(() => {
-    const list = this.authors();
-    const nameMap = new Map<string, Set<number>>();
-    for (const a of list) {
-      const key = `${a.firstName.trim().toLowerCase()}|${a.lastName.trim().toLowerCase()}`;
-      const bucket = nameMap.get(key);
-      if (bucket) {
-        bucket.add(a.idBook);
-      } else {
-        nameMap.set(key, new Set([a.idBook]));
-      }
-    }
-    return list.map(a => {
-      const key = `${a.firstName.trim().toLowerCase()}|${a.lastName.trim().toLowerCase()}`;
-      return {
-        ...a,
-        fullName: `${a.firstName} ${a.lastName}`,
-        initials: `${a.firstName[0] ?? ''}${a.lastName[0] ?? ''}`.toUpperCase(),
-        bookCount: nameMap.get(key)?.size ?? 0
-      };
-    });
+    return this.authors().map(a => ({
+      ...a,
+      fullName: `${a.firstName} ${a.lastName}`,
+      initials: `${a.firstName[0] ?? ''}${a.lastName[0] ?? ''}`.toUpperCase(),
+      bookTitle: a.bookTitle ?? null,
+      bookCount: a.bookCount ?? 0
+    }));
   });
 
   protected readonly filteredAuthors = computed<EnrichedAuthor[]>(() => {
@@ -101,7 +88,8 @@ export class AuthorListComponent {
       a.lastName.toLowerCase().includes(term) ||
       a.fullName.toLowerCase().includes(term) ||
       a.initials.toLowerCase().includes(term) ||
-      a.idBook.toString().includes(term)
+      a.idBook.toString().includes(term) ||
+      (a.bookTitle?.toLowerCase().includes(term) ?? false)
     );
   });
 

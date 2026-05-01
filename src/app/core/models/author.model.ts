@@ -3,6 +3,8 @@ export interface Author {
   idBook: number;
   firstName: string;
   lastName: string;
+  bookTitle?: string | null;
+  bookCount?: number;
 }
 
 export interface CreateAuthorRequest {

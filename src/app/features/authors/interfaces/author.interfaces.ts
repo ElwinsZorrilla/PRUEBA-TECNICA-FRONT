@@ -10,5 +10,6 @@ export interface AuthorFormShape {
 export interface EnrichedAuthor extends Author {
   fullName: string;
   initials: string;
+  bookTitle: string | null;
   bookCount: number;
 }
